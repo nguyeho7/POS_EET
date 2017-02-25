@@ -4,6 +4,7 @@ import random
 from classes import ReceiptItem, Receipt
 from dbutils import save_to_db, get_item, get_latest_receipt_id
 from eet_utils import send_receipt 
+from printing_utils import *
 import pygtk
 pygtk.require('2.0')
 import gtk
@@ -95,7 +96,7 @@ class DbGui:
             # save to tmp
             # print_POS(format_receipt(receipt, succ=False))
         else:
-            date = eet_result['date_recieved']
+            date = eet_result['date_received']
             fik = eet_result['fik']
             bkp = eet_result['bkp']
         #	
@@ -112,6 +113,8 @@ class DbGui:
         self.current_value += price
         self.store.append([name, price, dph, barcode])
         self.textbuffer.set_text(str(self.current_value))
+        self.barentry.set_text("")
+        self.barentry.grab_focus()
 
     def create_upper_hbox(self):
         self.upper_hbox = gtk.HBox(False, 0)
@@ -155,7 +158,6 @@ class DbGui:
         vbox.pack_start(self.create_upper_hbox(), False, False, 0)
                                   #name, price, dph, barcode
         self.store = gtk.ListStore(str, float, str, str)
-        self.add_and_update('ayy', 33.0, "lmao", "carovy kod")
         self.textbuffer.set_text(str(self.current_value))
         self.scrollable_treelist = gtk.ScrolledWindow()
         self.create_receipt_view()
@@ -170,12 +172,8 @@ class DbGui:
 
         receipt_button = gtk.Button("Poslat EET")
         receipt_button.connect("clicked", lambda x: self.create_receipt())
-        add_button = gtk.Button("pridej polozku")
-        add_button.connect("clicked", lambda x:self.add_and_update('aaaayy', random.random()*50.0, "lmao", "pls no"))
         vbox.pack_start(receipt_button, True, True, 0)
-        vbox.pack_start(add_button, True, True, 0)
         receipt_button.show()
-        add_button.show()
         window.show()
 
 def main():

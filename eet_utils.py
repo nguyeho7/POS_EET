@@ -6,6 +6,7 @@ import config
 # FUCKING DB JESUS FUCKKKKKKKK
 # pickle failed payments?
 def send_receipt(receipt, testing=True):
+    testing = config.testing
     amount = 0
     for item in receipt.items:
         amount += item.price

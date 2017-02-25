@@ -5,7 +5,7 @@ import subprocess
 header = config.header
 tail = config.tail
 MAX_L = 43
-def format_receipt(receipt):
+def format_receipt(receipt, succ=True):
     res = header + "\n"
     res += "dic: " + config.dic + "\n"
     res += "Uctenka cislo " + str(receipt.number) + "\n"
