@@ -77,7 +77,10 @@ class DbGui:
             self.current_value += item.price
             self.store.append([item.name, item.price, item.dph, barcode])
             self.textbuffer.set_text(str(self.current_value))
+            self.barentry.set_text("")
     
+            self.barentry.grab_focus()
+
     def create_receipt(self):
         items = []
         for item in self.store:
