@@ -3,6 +3,17 @@ from classes import *
 import sqlite3 as lite
 import config
 
+def add_to_pay():
+    con = lite.connect(config.dbname)
+    cur = con.cursor()
+    cur.execute('''create TABLE toPay (id integer PRIMARY KEY,
+    Date TEXT, 
+    receipt_id integer, 
+    pkp text,
+    foreign key(receipt_id) references Receipts(id))''')
+    con.commit()
+    con.close()
+
 def create_table():
     con = None
     con = lite.connect(config.dbname)
@@ -46,6 +57,30 @@ def save_to_db(item):
     con.commit()
     con.close()
 
+def save_toSend(receipt):
+    con = lite.connect(config.dbname)
+    cur = con.cursor()
+    cur.execute('''Insert into toPay(Date, receipt_id, pkp) values(?,?,?)''', 
+            (receipt.date, receipt.number, receipt.pkp))
+    con.commit()
+    con.close()
+
+def get_toSend(receipt):
+    receipts = []
+    con = lite.connect(config.dbname)
+    cur = con.cursor()
+    cur.execute('''select * toPay''')
+    res = cur.fetchall()
+    for rec_candidate in res:
+        cur = con.cursor()
+        cur.execute('''select * from Receipts where id = ?''', (rec_candidate[2]))
+        rr = cur.fetchone()
+        tmp_receipt = Receipt([])
+        tmp_receipt.date = rec_candidate[1]
+        tmp_receipt.value = rr[0]
+        receipts.add(Receipt([]))
+    con.close()
+
 def save_receipt(receipt):
     con = lite.connect(config.dbname)
     cur = con.cursor()
@@ -58,7 +93,6 @@ def save_receipt(receipt):
     # INSERT OR REPLACE
     cur.execute('''Insert into Receipts(Date, total_paid, fik, bkp) values(?,?,?,?)''', 
             (receipt.date, total_paid, receipt.fik, receipt.bkp))
-    receipt_id = cur.lastrowid
     con.commit()
     con.close()
 
@@ -83,7 +117,9 @@ def show_db_content():
     res = cur.fetchall()
     for item in res:
         print(item)
+
 if __name__ == '__main__':
    # create_table()
    show_db_content()
    print(get_latest_receipt_id())
+

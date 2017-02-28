@@ -2,7 +2,7 @@
 from __future__ import print_function
 import random
 from classes import ReceiptItem, Receipt
-from dbutils import save_to_db, get_item, get_latest_receipt_id
+from dbutils import save_toSend, get_item, get_latest_receipt_id, save_receipt
 from eet_utils import send_receipt 
 from printing_utils import *
 import pygtk
@@ -81,7 +81,7 @@ class DbGui:
     
             self.barentry.grab_focus()
 
-    def create_receipt(self):
+    def create_receipt(self, eet=True):
         items = []
         for item in self.store:
             items.append(ReceiptItem(item[3], item[1], item[2], item[0]))
@@ -89,24 +89,30 @@ class DbGui:
         receipt = Receipt(items)
         num = get_latest_receipt_id()
         if num == None:
-            num = 0
+            num = 1
         receipt.number = num + 1 # next ID
-        eet_result = send_receipt(receipt)
+        eet_result = send_receipt(receipt, testing=eet)
         
         if eet_result['fik'] == None:
             print(eet_result['message'])
             date = eet_result['date_rejected']
+            receipt.bkp = bkp
+            pkp = utils.prepare_pkp(config.dic, config.provozovna_number, config.pokladna_id, receipt.number,result.date, amount)
+            receipt.pkp = pkp
+            print_POS(format_receipt(receipt, succ=False))
             # save to tmp
-            # print_POS(format_receipt(receipt, succ=False))
+            if eet:
+                save_toSend(receipt)
         else:
             date = eet_result['date_received']
             fik = eet_result['fik']
             bkp = eet_result['bkp']
-        #	
             receipt.fik = fik
             receipt.bkp = bkp
             receipt.date = date
             print_POS(format_receipt(receipt, succ=True))
+            if eet :
+                save_receipt(receipt)
             self.current_value = 0
             self.store.clear()
             self.textbuffer.set_text(str(self.current_value))
@@ -126,6 +132,7 @@ class DbGui:
         self.barentry = gtk.Entry()
         self.bar_label = gtk.Label('Carovy kod')
         self.barentry.show()
+        self.barentry.grab_focus()
         self.barentry.connect("activate", lambda x: self.add_to_store())
         self.bar_label.show()
         self.barentry.select_region(0, len(self.barentry.get_text()))
