@@ -5,11 +5,17 @@ from classes import ReceiptItem, Receipt
 from dbutils import save_toSend, get_item, get_latest_receipt_id, save_receipt
 from eet_utils import send_receipt 
 from printing_utils import *
+from eet import utils
 import pygtk
 pygtk.require('2.0')
 import gtk
 
 class DbGui:
+    def print_to_file(text, filename = "logs.tmp"):
+        with open(filename, 'a') as f:
+            f.write(text)
+            f.write('\n')
+ 
     def handle_input(self, nameentry, priceentry):
         name = nameentry.get_text()
         price = float(priceentry.get_text())
@@ -96,13 +102,18 @@ class DbGui:
         if eet_result['fik'] == None:
             print(eet_result['message'])
             date = eet_result['date_rejected']
-            receipt.bkp = bkp
-            pkp = utils.prepare_pkp(config.dic, config.provozovna_number, config.pokladna_id, receipt.number,result.date, amount)
-            receipt.pkp = pkp
+            receipt.bkp = eet_result['bkp']
+            amount = 0
+            for item in receipt.items:
+                amount += item.price
+            receipt.pkp = eet_result['pkp']
+            receipt.fik = "None"
             print_POS(format_receipt(receipt, succ=False))
             # save to tmp
             if eet:
+                save_receipt(receipt)
                 save_toSend(receipt)
+                print_to_file(str(receipt))
         else:
             date = eet_result['date_received']
             fik = eet_result['fik']
@@ -182,6 +193,7 @@ class DbGui:
 
         receipt_button = gtk.Button("Poslat EET")
         receipt_button.connect("clicked", lambda x: self.create_receipt())
+        self.barentry.grab_focus()
         vbox.pack_start(receipt_button, True, True, 0)
         receipt_button.show()
         window.show()
