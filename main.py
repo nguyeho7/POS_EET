@@ -97,15 +97,15 @@ class DbGui:
             num = 1
         receipt.number = num + 1 # next ID
         eet_result = send_receipt(receipt, testing=eet)
-        
+        amount = 0
+        for item in receipt.items:
+            amount += item.price
         if eet_result['fik'] == None:
             print(eet_result['message'])
             date = eet_result['date_rejected']
             receipt.fik = "None"
             receipt.bkp = eet_result['bkp']
-            amount = 0
-            for item in receipt.items:
-                amount += item.price
+            receipt.total_paid = amount
             receipt.pkp = eet_result['pkp']
             receipt.fik = "None"
             print_POS(format_receipt(receipt, succ=False))
@@ -121,6 +121,7 @@ class DbGui:
             receipt.fik = fik
             receipt.bkp = bkp
             receipt.date = date
+            receipt.total_paid = amount
             print_POS(format_receipt(receipt, succ=True))
             if eet :
                 save_receipt(receipt)
