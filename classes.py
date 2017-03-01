@@ -6,12 +6,18 @@ class Receipt(object):
     def __init__(self, items):
         self.items = []
         self.date = date.today()
+        self.fik = "None"
+        self.bkp = "None"
+        self.total_paid = 0
         for item in items:
             self.items.append(item)
+
     def __str__(self):
-	    res = ""
-	    for item in self.items:
-		    res += str(item) + "\n"
+        res = ""
+        for item in self.items:
+            res += str(item) + "\n"
+        res += date + "\n"
+        res += total_paid + "\n"
 
 class ReceiptItem(object):
     
