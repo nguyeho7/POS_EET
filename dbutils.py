@@ -119,6 +119,16 @@ def show_db_content():
     for item in res:
         print(item)
 
+def get_total():
+    con = lite.connect(config.dbname)
+    cur = con.cursor()
+    cur.execute('''select * from Receipts''')
+    res = cur.fetchall()
+    value = 0
+    for item in res:
+        value += item[2]
+    return value
+
 if __name__ == '__main__':
    # create_table()
    show_db_content()
