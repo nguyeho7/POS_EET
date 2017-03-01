@@ -4,7 +4,7 @@ import config
 import subprocess
 header = config.header
 tail = config.tail
-MAX_L = 43
+MAX_L = 34
 def format_receipt(receipt, succ=True):
     res = header + "\n"
     res += "dic: " + config.dic + "\n"
@@ -19,14 +19,19 @@ def format_receipt(receipt, succ=True):
     total_l = len("{:.2f}".format(total))
     res += "Celkove{}{:.2f}\n".format(((MAX_L -7 -total_l) * "."), total)
     res += "A ted EET zabava: \n"
-    res += "fik: " +receipt.fik + "\n" #textwrap these
+    if succ:
+        res += "fik: " +receipt.fik + "\n" #textwrap these
+    else:
+        res += "Nebylo navazano spojeni, tiskneme PKP\n"
+        res += "PKP: " +receipt.pkp + "\n" 
     res += "bkp: " +receipt.bkp + "\n" 
+    res += "datum: "+ receipt.date + "\n"
     res += tail
     print(res)
     return(res)
 
 def print_POS(text):
-    p = subprocess.Popen(['lp', '-d', 'POS58', '-o', 'cpi=23', '-o', 'lpi=10','-'], stdin=subprocess.PIPE)
+    p = subprocess.Popen(['lp', '-d', 'POS58', '-o', 'cpi=18', '-o', 'lpi=10','-'], stdin=subprocess.PIPE)
     p.communicate(str.encode(text))
 
 def main():
