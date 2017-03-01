@@ -96,12 +96,12 @@ class DbGui:
         if eet_result['fik'] == None:
             print(eet_result['message'])
             date = eet_result['date_rejected']
-            receipt.bkp = bkp
-            pkp = utils.prepare_pkp(config.dic, config.provozovna_number, config.pokladna_id, receipt.number,result.date, amount)
-            receipt.pkp = pkp
+            receipt.fik = "None"
+            receipt.pkp = eet_result['pkp']
             print_POS(format_receipt(receipt, succ=False))
             # save to tmp
             if eet:
+                save_receipt(receipt)
                 save_toSend(receipt)
         else:
             date = eet_result['date_received']
@@ -118,6 +118,8 @@ class DbGui:
             self.textbuffer.set_text(str(self.current_value))
             self.barentry.grab_focus()
 
+    def try_resend(self):
+        pass
     def add_and_update(self, name, price, dph, barcode):
         self.current_value += price
         self.store.append([name, price, dph, barcode])

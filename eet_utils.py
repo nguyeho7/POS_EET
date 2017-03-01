@@ -19,6 +19,7 @@ def send_receipt(receipt, testing=True):
     payment = eet_client.create_payment(receipt.number, amount, test=False)
     result = eet_client.send_payment(payment)
     print(result)
-    pkp = utils.prepare_pkp(config.dic, config.provozovna_number, config.pokladna_id,
-            receipt.number,result.date, amount)
+    trzba = payment.xml(eet_client._signing)
+    pkp = trzba[2][0].text
+    result.update({"pkp": pkp})
     return result
