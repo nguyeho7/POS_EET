@@ -80,6 +80,7 @@ def get_toSend(receipt):
         tmp_receipt.value = rr[0]
         receipts.add(Receipt([]))
     con.close()
+    return receipts
 
 def save_receipt(receipt):
     con = lite.connect(config.dbname)
