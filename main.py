@@ -2,7 +2,7 @@
 from __future__ import print_function
 import random
 from classes import ReceiptItem, Receipt
-from dbutils import save_toSend, get_item, get_latest_receipt_id, save_receipt
+from dbutils import save_toSend, get_item, get_latest_receipt_id, save_receipt, get_total
 from eet_utils import send_receipt 
 from printing_utils import *
 from eet import utils
@@ -53,7 +53,6 @@ class DbGui:
         vbox.pack_start(hbox)
         answerwin.add(vbox)
         answerwin.show()   
-
    
     def create_receipt_view(self):
         self.treeView = gtk.TreeView(self.store)
@@ -139,6 +138,11 @@ class DbGui:
         self.barentry.set_text("")
         self.barentry.grab_focus()
 
+    def print_earnings(self):
+        val = get_total()
+        print_POS(format_total(val))
+        self.barentry.grab_focus()
+
     def create_upper_hbox(self):
         self.upper_hbox = gtk.HBox(False, 0)
         # barcode with label
@@ -156,8 +160,12 @@ class DbGui:
         # add custom button
         custom_button = gtk.Button("vlastni polozka")
         custom_button.connect("clicked", lambda w: self.custom_entry())
+        self.print_all_button = gtk.Button("Vytisknout trzby")
+        self.print_all_button.connect('clicked', lambda x: self.print_earnings())
+        self.print_all_button.show()
         self.upper_hbox.pack_start(self.label_box, True)
         self.upper_hbox.pack_start(custom_button)
+        self.upper_hbox.pack_start(self.print_all_button, True)
         custom_button.show()
         self.upper_hbox.show()
         return self.upper_hbox 
@@ -193,7 +201,6 @@ class DbGui:
         hbox.pack_start(vbox)
         vbox.show()
         hbox.show()
-
         receipt_button = gtk.Button("Poslat EET")
         receipt_button.connect("clicked", lambda x: self.create_receipt())
         self.barentry.grab_focus()
