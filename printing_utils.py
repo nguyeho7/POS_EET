@@ -22,7 +22,13 @@ def format_receipt(receipt, succ=True):
         dots = (MAX_L -name_l-price_l) * "."
         res += "{}{}{:.2f}\n".format(item.name, dots, item.price)
     total_l = len("{:.2f}".format(total))
+    rounded = round(total)
+    rounded_l = len("{:.2f}".format(rounded))
+    difference = rounded - total 
+    res += "\n"
     res += "Celkove{}{:.2f}\n".format(((MAX_L -7 -total_l) * "."), total)
+    res += "Zaokrouhleni{}{:.2f}\n".format(((MAX_L -12 -rounded_l) * "."), difference)
+    res += "Zaplaceno{}{:.2f}\n".format(((MAX_L -9 -rounded_l) * "."), rounded)
     res += "A ted EET zabava: \n"
     if succ:
         res += "fik: " +receipt.fik + "\n" #textwrap these
@@ -30,7 +36,7 @@ def format_receipt(receipt, succ=True):
         res += "Nebylo navazano spojeni, tiskneme PKP\n"
         res += "PKP: " +receipt.pkp + "\n" 
     res += "bkp: " +receipt.bkp + "\n" 
-    res += "datum: "+ receipt.date + "\n"
+    res += "datum: "+ str(receipt.date) + "\n"
     res += tail
     print(res)
     return(res)
