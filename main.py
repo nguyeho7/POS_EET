@@ -20,7 +20,7 @@ class DbGui:
         name = nameentry.get_text()
         price = float(priceentry.get_text())
         count_text = self.item_count.get_text()
-        if count_text.isnumeric():
+        if str.isnumeric(count_text):
             count = int(count_text)
         else:
             count = 1
@@ -84,7 +84,7 @@ class DbGui:
         barcode = self.barentry.get_text()
         item = get_item(barcode)
         count_text = self.item_count.get_text()
-        if count_text.isnumeric():
+        if str.isnumeric(count_text):
             count = int(count_text)
         else:
             count = 1
