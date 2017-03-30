@@ -19,7 +19,14 @@ class DbGui:
     def handle_input(self, nameentry, priceentry):
         name = nameentry.get_text()
         price = float(priceentry.get_text())
-        self.add_and_update(name, price, "15", barcode="Custom") 
+        count_text = self.item_count.get_text()
+        if count.isnumeric():
+            count = int(count_text)
+        else:
+            count = 1
+        for x in count:
+            self.add_and_update(name, price, "15", barcode="Custom") 
+        self.item_count.set_text("1")
 
     def custom_entry(self, widget=None, data=None):
         answerwin = gtk.Window()
@@ -76,15 +83,20 @@ class DbGui:
     def add_to_store(self):
         barcode = self.barentry.get_text()
         item = get_item(barcode)
-        print(item)
+        count_text = self.item_count.get_text()
+        if count.isnumeric():
+            count = int(count_text)
+        else:
+            count = 1
         if item == None:
             return
         else:
-            self.current_value += item.price
-            self.store.append([item.name, item.price, item.dph, barcode])
-            self.textbuffer.set_text(str(self.current_value))
+            for x in count:
+                self.current_value += item.price
+                self.store.append([item.name, item.price, item.dph, barcode])
+                self.textbuffer.set_text(str(self.current_value))
+            self.item_count.set_text("1")
             self.barentry.set_text("")
-    
             self.barentry.grab_focus()
 
     def create_receipt(self, eet=True):
@@ -180,6 +192,10 @@ class DbGui:
         window.set_title("Pokladna")
         window.connect("delete_event", lambda w,e: gtk.main_quit())
 
+        self.item_count = gtk.Entry()
+        self.item_count.set_text("1")
+        self.item_count_label = gtk.Label('Pocet kusu')
+
         hbox = gtk.HBox(False,0)
         window.add(hbox)
         self.textview = gtk.TextView()
@@ -206,7 +222,11 @@ class DbGui:
         receipt_button = gtk.Button("Poslat EET")
         receipt_button.connect("clicked", lambda x: self.create_receipt())
         self.barentry.grab_focus()
+        vbox.pack_start(self.item_count_label, True, True, 0)
+        vbox.pack_start(self.item_count, True, True, 0)
         vbox.pack_start(receipt_button, True, True, 0)
+        self.item_count.show()
+        self.item_count_label.show()
         receipt_button.show()
         window.show()
 
