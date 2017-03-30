@@ -76,6 +76,7 @@ class DbGui:
     def add_to_store(self):
         barcode = self.barentry.get_text()
         item = get_item(barcode)
+        print(item)
         if item == None:
             return
         else:
