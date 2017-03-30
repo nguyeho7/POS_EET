@@ -24,7 +24,7 @@ class DbGui:
             count = int(count_text)
         else:
             count = 1
-        for x in count:
+        for x in range(count):
             self.add_and_update(name, price, "15", barcode="Custom") 
         self.item_count.set_text("1")
 
@@ -91,7 +91,7 @@ class DbGui:
         if item == None:
             return
         else:
-            for x in count:
+            for x in range(count):
                 self.current_value += item.price
                 self.store.append([item.name, item.price, item.dph, barcode])
                 self.textbuffer.set_text(str(self.current_value))
@@ -196,6 +196,7 @@ class DbGui:
         self.item_count.set_text("1")
         self.item_count_label = gtk.Label('Pocet kusu')
 
+        self.item_count.connect("activate", lambda x: self.barentry.grab_focus())
         hbox = gtk.HBox(False,0)
         window.add(hbox)
         self.textview = gtk.TextView()
