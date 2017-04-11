@@ -1,10 +1,6 @@
 import eet
 import config
 # read number from file
-# instead of db, append 
-# handle errors here
-# FUCKING DB JESUS FUCKKKKKKKK
-# pickle failed payments?
 def send_receipt(receipt, testing=True):
     testing = config.testing
     amount = 0
@@ -22,4 +18,12 @@ def send_receipt(receipt, testing=True):
     pkp = trzba[2][0].text
     result.update({"pkp": pkp})
     print(result)
+    return result
+
+def resend_receipt(receipt):
+    amount = receipt.total_paid
+    eet_client = eet.EET(config.cert_path, config.cert_pass, provozovna=config.provozovna_number,
+            pokladna='pokladna001', testing=False, eet_url=config.eet_url)
+    payment = eet_client.create_payment(receipt.number, amount, first=False, test=False)
+    result = eet_client.send_payment(payment)
     return result

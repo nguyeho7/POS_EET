@@ -2,7 +2,7 @@
 from __future__ import print_function
 import random
 from classes import ReceiptItem, Receipt
-from dbutils import save_toSend, get_item, get_latest_receipt_id, save_receipt, get_total
+from dbutils import *
 from eet_utils import send_receipt 
 from printing_utils import *
 from eet import utils
@@ -75,7 +75,6 @@ class DbGui:
         if result:
             model, treeiter = result
             price = model.get_value(treeiter, 1)
-            print(price)
             self.current_value -= price
             self.textbuffer.set_text(str(self.current_value))
             model.remove(treeiter)
@@ -99,8 +98,21 @@ class DbGui:
             self.barentry.set_text("")
             self.barentry.grab_focus()
 
+    def try_send_failed_receipts(self):
+        receipts = get_toSend()
+        num_of_receipts = len(receipts)
+        print("trying to send {} receipts".format(num_of_receipts))
+        for receipt in receipts:
+            eet_result = resend_receipt(receipt)
+            if eet_result['fik'] != None:
+                print("sent " + str(receipt) + " successfully")
+                delete_toSend(receipt)
+            else:
+                print("sending failed, will try later")
+
     def create_receipt(self, eet=True):
         items = []
+        self.try_send_failed_receipts()
         for item in self.store:
             items.append(ReceiptItem(item[3], item[1], item[2], item[0]))
             print(items[-1])
@@ -120,6 +132,7 @@ class DbGui:
             receipt.bkp = eet_result['bkp']
             receipt.total_paid = amount
             receipt.pkp = eet_result['pkp']
+            receipt.amount = amount
             receipt.fik = "None"
             print_POS(format_receipt(receipt, succ=False))
             # save to tmp

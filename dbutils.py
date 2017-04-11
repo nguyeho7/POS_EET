@@ -11,7 +11,9 @@ def add_to_pay():
     Date TEXT, 
     receipt_id integer, 
     pkp text,
-    foreign key(receipt_id) references Receipts(id))''')
+    bkp text,
+    total_paid float
+    ''')
     con.commit()
     con.close()
 
@@ -56,32 +58,39 @@ def save_to_db(item):
     cur.execute('''REPLACE into Items(barcode, name, price, dph) values(?,?,?,?)''', 
             (barcode, name, price, dph))
     con.commit()
-    con.close()
 
 def save_toSend(receipt):
     con = lite.connect(config.dbname)
     cur = con.cursor()
-    cur.execute('''Insert into toPay(Date, receipt_id, pkp) values(?,?,?)''', 
-            (receipt.date, receipt.number, receipt.pkp))
+    cur.execute('''Insert into toPay(Date, receipt_id, pkp, bkp, total_paid)) values(?,?,?,?,?)''', 
+            (receipt.date, receipt.number, receipt.pkp, receipt.bkp, receipt.total_paid))
     con.commit()
     con.close()
 
-def get_toSend(receipt):
+def get_toSend():
     receipts = []
     con = lite.connect(config.dbname)
     cur = con.cursor()
-    cur.execute('''select * toPay''')
+    cur.execute('''select * from toPay''')
     res = cur.fetchall()
     for rec_candidate in res:
-        cur = con.cursor()
-        cur.execute('''select * from Receipts where id = ?''', (rec_candidate[2]))
-        rr = cur.fetchone()
         tmp_receipt = Receipt([])
         tmp_receipt.date = rec_candidate[1]
-        tmp_receipt.value = rr[0]
-        receipts.add(Receipt([]))
+        tmp_receipt.number = rec_dandidate[2]
+        tmp_receipt.pkp = rec_candidate[3]
+        tmp_receipt.bkp = rec_dandidate[4]
+        tmp_receipt.total_paid = rec_candidate[5]
+        receipts.add(tmp_receipt)
     con.close()
     return receipts
+
+def delete_toSend(receipt):
+    receipt_id = receipt.number
+    con = lite.connect(config.dbname)
+    cur = con.cursor()
+    cur.execute('''delete from toPay where receipt_id = ?''', (receipt_id,))
+    con.commit()
+    con.close()
 
 def save_receipt(receipt):
     con = lite.connect(config.dbname)
