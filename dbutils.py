@@ -4,6 +4,13 @@ from datetime import datetime
 import sqlite3 as lite
 import config
 
+def remove_to_pay():
+    con = lite.connect(config.dbname)
+    cur = con.cursor()
+    cur.execute('''drop TABLE toPay''')
+    con.commit()
+    con.close()
+
 def add_to_pay():
     con = lite.connect(config.dbname)
     cur = con.cursor()
@@ -12,7 +19,7 @@ def add_to_pay():
     receipt_id integer, 
     pkp text,
     bkp text,
-    total_paid float
+    total_paid float)
     ''')
     con.commit()
     con.close()
@@ -62,7 +69,7 @@ def save_to_db(item):
 def save_toSend(receipt):
     con = lite.connect(config.dbname)
     cur = con.cursor()
-    cur.execute('''Insert into toPay(Date, receipt_id, pkp, bkp, total_paid)) values(?,?,?,?,?)''', 
+    cur.execute('''Insert into toPay(Date, receipt_id, pkp, bkp, total_paid) values(?,?,?,?,?)''', 
             (receipt.date, receipt.number, receipt.pkp, receipt.bkp, receipt.total_paid))
     con.commit()
     con.close()
@@ -76,11 +83,12 @@ def get_toSend():
     for rec_candidate in res:
         tmp_receipt = Receipt([])
         tmp_receipt.date = rec_candidate[1]
-        tmp_receipt.number = rec_dandidate[2]
+        tmp_receipt.number = rec_candidate[2]
         tmp_receipt.pkp = rec_candidate[3]
-        tmp_receipt.bkp = rec_dandidate[4]
+        tmp_receipt.bkp = rec_candidate[4]
         tmp_receipt.total_paid = rec_candidate[5]
-        receipts.add(tmp_receipt)
+        receipts.append(tmp_receipt)
+        print(tmp_receipt)
     con.close()
     return receipts
 
@@ -140,7 +148,8 @@ def get_total():
     return value
 
 if __name__ == '__main__':
-   # create_table()
+   create_table()
+   add_to_pay()
    show_db_content()
    print(get_latest_receipt_id())
 

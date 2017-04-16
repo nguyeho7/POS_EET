@@ -16,8 +16,9 @@ class Receipt(object):
         res = ""
         for item in self.items:
             res += str(item) + "\n"
-        res += date + "\n"
-        res += total_paid + "\n"
+        res += str(self.date) + "\n"
+        res += str(self.total_paid) + "\n"
+        return res
 
 class ReceiptItem(object):
     

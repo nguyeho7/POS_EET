@@ -3,7 +3,7 @@ from __future__ import print_function
 import random
 from classes import ReceiptItem, Receipt
 from dbutils import *
-from eet_utils import send_receipt 
+from eet_utils import *
 from printing_utils import *
 from eet import utils
 import pygtk
@@ -11,9 +11,9 @@ pygtk.require('2.0')
 import gtk
 
 class DbGui:
-    def print_to_file(text, filename = "logs.tmp"):
+    def print_to_file(self, to_print, filename = "logs.tmp"):
         with open(filename, 'a') as f:
-            f.write(text)
+            f.write(to_print)
             f.write('\n')
  
     def handle_input(self, nameentry, priceentry):
@@ -126,20 +126,22 @@ class DbGui:
         for item in receipt.items:
             amount += item.price
         if eet_result['fik'] == None:
-            print(eet_result['message'])
-            date = eet_result['date_rejected']
             receipt.fik = "None"
-            receipt.bkp = eet_result['bkp']
+            receipt.bkp = "None"
             receipt.total_paid = amount
             receipt.pkp = eet_result['pkp']
             receipt.amount = amount
-            receipt.fik = "None"
             print_POS(format_receipt(receipt, succ=False))
+            print("failed to send receipt")
             # save to tmp
             if eet:
                 save_receipt(receipt)
                 save_toSend(receipt)
-                print_to_file(str(receipt))
+                self.print_to_file(str(receipt))
+                self.current_value = 0
+                self.store.clear()
+                self.textbuffer.set_text(str(self.current_value))
+                self.barentry.grab_focus()
         else:
             date = eet_result['date_received']
             fik = eet_result['fik']
